@@ -36,7 +36,7 @@ function bp_dump() {
 
 
 /**
- * adiciona a tab de eventos no grupo de eventos.
+ * adiciona a tab do componente de eventos no grupo de eventos.
  */
 function add_event_group_activity_tab() {
 	global $bp;
@@ -97,17 +97,31 @@ function bp_events_display_content(){
 	//assim que botar o CPT para funcionar tem que fazer um custom loop aqui.
 	if ( is_user_logged_in() && bp_group_is_member() ){
 		locate_template( array( 'activity/post-form.php'), true );
-		add_action('bp_before_activity_post_form', 'bp_events_group_modify_activity_forms');
 		locate_template( array( 'activity/activity-loop.php' ), true );
 	}
 }
 
-function bp_events_group_modify_activity_forms(){
-	
-	
-	
+function bp_events_group_add_activity_forms_hooks(){
+	global $bp;
+	$me = new BpfbBinder;
+	if('activity' == $bp->current_action && is_events_group()){
+
+		add_action('wp_print_scripts', array($me, 'js_plugin_url'));
+		add_action('wp_print_scripts', array($me, 'js_load_scripts'));
+		add_action('wp_print_styles', array($me, 'css_load_styles'));
+		add_action('bp_activity_post_form_options','bp_events_group_modify_activity_forms_after');
+	}
+
 }
 
+add_action('init', 'bp_events_group_add_activity_forms_hooks');
+
+function bp_events_group_modify_activity_forms_after(){
+	?>
+	<input type="hidden" id="whats-new-post-object" name="whats-new-post-object" value="groups" />
+	<input type="hidden" id="whats-new-post-in" name="whats-new-post-in" value="<?php bp_group_id(); ?>" />
+	<?php 
+}
 
 
 function is_events_group(){
