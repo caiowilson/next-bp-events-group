@@ -2,10 +2,10 @@
 /*
  Plugin Name: NEXT Events addon
 Author: Caio Wilson
-Description: Plugin para transformar o grupo Eventos num tipo de grupo. Remove outros menus e seta a pagina de forums como inicial do grupo e subgrupos.
+Description: Plugin para transformar o grupo Eventos num tipo de grupo. Remove outros menus e seta a pagina de forums como inicial do grupo e subgrupos. NECESSITA DO PLUGIN buddypress-activity-plus
 License: GPLv3
 
-Copyright YEAR  PLUGIN_AUTHOR_NAME  (email : PLUGIN AUTHOR EMAIL)
+Copyright 2012  Caio Wilson  (email : caiowilson@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as
@@ -36,9 +36,9 @@ function bp_dump() {
 
 
 /**
- * adiciona a tab do componente de eventos no grupo de eventos.
+ * adiciona as tabs dos componentse de eventos no grupo de eventos.
  */
-function add_event_group_activity_tab() {
+function add_event_group_activity_tabs() {
 	global $bp;
 
 	if(bp_is_group() && is_events_group()) {
@@ -59,22 +59,40 @@ function add_event_group_activity_tab() {
 			add_action( 'bp_template_content_header', create_function( '', 'echo "' . esc_attr( 'Activity' ) . '";' ) );
 			add_action( 'bp_template_title', create_function( '', 'echo "' . esc_attr( 'Activity' ) . '";' ) );
 		}
+		
+		bp_core_new_subnav_item(
+		array(
+		'name' => 'Search',
+		'slug' => 'activity-search',
+		'parent_slug' => $bp->groups->current_group->slug,
+		'parent_url' => bp_get_group_permalink( $bp->groups->current_group ),
+		'position' => 12,
+		'item_css_id' => 'nav-activity-search',
+		'screen_function' => 'create_event_group_content_search',
+		'user_has_access' => 1
+		)
+		);
+		
+		if ( bp_is_current_action( 'activity-search' ) ) {
+			add_action( 'bp_template_content_header', create_function( '', 'echo "' . esc_attr( 'Activity Search' ) . '";' ) );
+			add_action( 'bp_template_title', create_function( '', 'echo "' . esc_attr( 'Activity Search' ) . '";' ) );
+		}
 	}
 }
 
-add_action( 'bp_actions', 'add_event_group_activity_tab', 8 );
+add_action( 'bp_actions', 'add_event_group_activity_tabs', 8 );
+
+
+
 
 /**
  * cria o conteúdo do component criado.
  */
 function create_event_group_content(){
-	
-	/* add_action('bp_template_content_header', 'bp_group_documents_display_header');
-	add_action('bp_template_title', 'bp_group_documents_display_title');
-	add_action('bp_template_content', 'bp_group_documents_display_content'); */
-	
+
+
 	add_action('bp_template_content', 'bp_events_display_content');
-	
+
 	// Load the plugin template file.
 	// BP 1.2 breaks it out into a group-specific template
 	// BP 1.1 includes a generic "plugin-template file
@@ -86,8 +104,32 @@ function create_event_group_content(){
 	} else {
 		bp_core_load_template(apply_filters('bp_core_template_plugin', 'plugin-template'));
 	}
-	
+
 }
+
+/**
+ * cria o conteúdo do component search criado.
+ */
+function create_event_group_content_search(){
+
+
+	add_action('bp_template_content', 'bp_events_display_content_search');
+
+	// Load the plugin template file.
+	// BP 1.2 breaks it out into a group-specific template
+	// BP 1.1 includes a generic "plugin-template file
+	//this is a roundabout way of doing it, because I can't find a way to use bp_core_template
+	//to either return a useful value or handle an array of templates
+	$templates = array('groups/single/plugins.php', 'plugin-template.php');
+	if (strstr(locate_template($templates), 'groups/single/plugins.php')) {
+		bp_core_load_template(apply_filters('bp_core_template_plugin', 'groups/single/plugins'));
+	} else {
+		bp_core_load_template(apply_filters('bp_core_template_plugin', 'plugin-template'));
+	}
+
+}
+
+
 
 /**
  * faz o output do component 
@@ -101,6 +143,76 @@ function bp_events_display_content(){
 	}
 }
 
+/**
+ * faz o output do component search
+ */
+function bp_events_display_content_search(){
+
+	//add_action('bp_has_activities','bp_events_activity_search_loop', 10, 2 );
+	if ( is_user_logged_in() && bp_group_is_member() ){
+		//locate_template( array( 'activity/activity-loop.php' ), true );
+		$file = $_SERVER["SCRIPT_NAME"];
+		$path_details=pathinfo($file);
+		$searchterm = @$_POST['searchterm'];
+		
+		?><form NAME ="event-activity-search-form" METHOD ="post" ACTION = "<?php echo $path_details['basename'];  ?>">
+		
+		<input TYPE = "TEXT" id="event-activity-search-input"   Name="searchterm" value="" >
+		
+		<INPUT TYPE = "Submit" Name = "event-activity-search-submit-button" id="event-activity-search-submit-button" VALUE = "Search Activity">
+		
+		</form><?php
+		
+		if ( bp_has_activities('search_terms=' . $searchterm) ) :
+		while ( bp_activities() ) : bp_the_activity();
+
+		locate_template( array( 'activity/entry.php' ), true, false );
+
+		endwhile;
+		else : ?>
+			<div id="message" class="info">
+				<p><?php _e( 'Sorry, there was no activity found. Please try a different filter.', 'buddypress' ) ?></p>
+			</div><?php 
+		endif;
+	}
+}
+
+function bp_events_activity_search_loop( $a, $activities ) {
+
+	if ( is_events_group() ){
+		$a .= '&search_terms=teste'; //. @$_POST['events-search-terms'];
+		return $a;
+	}
+		
+	else
+		return $activities;
+	/*foreach ( $activities->activities as $key => $activity ) {
+		
+		print $activity;
+		//new_member is the type name (component is 'profile')
+		 if ( $activity->type =='new_member') {
+			unset( $activities->activities[$key] );
+
+			$activities->activity_count = $activities->activity_count-1;
+			$activities->total_activity_count = $activities->total_activity_count-1;
+			$activities->pag_num = $activities->pag_num -1;
+		} 
+	}*/
+
+	/* Renumber the array keys to account for missing items */
+	/* $activities_new = array_values( $activities->activities );
+	$activities->activities = $activities_new; */
+
+	return $activities;
+}
+
+
+
+
+
+/**
+ * registra os hooks do componente ao hook init
+ */
 function bp_events_group_add_activity_forms_hooks(){
 	global $bp;
 	$me = new BpfbBinder;
