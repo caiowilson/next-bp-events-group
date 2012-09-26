@@ -164,14 +164,15 @@ function bp_events_display_content_search(){
 		</form><?php
 		
 		if ( bp_has_activities('search_terms=' . $searchterm) ) :
-		while ( bp_activities() ) : bp_the_activity();
-
-		locate_template( array( 'activity/entry.php' ), true, false );
-
-		endwhile;
+			while ( bp_activities() ) : bp_the_activity();
+				?><ul id="activity-stream" class="activity-list item-list">
+				<?php 
+				locate_template( array( 'activity/entry.php' ), true, false );
+				?></ul><?php
+			endwhile;
 		else : ?>
 			<div id="message" class="info">
-				<p><?php _e( 'Sorry, there was no activity found. Please try a different filter.', 'buddypress' ) ?></p>
+			<p><?php _e( 'Sorry, there was no activity found. Please try a different filter.', 'buddypress' ) ?></p>
 			</div><?php 
 		endif;
 	}
