@@ -148,7 +148,7 @@ function bp_events_display_content(){
  */
 function bp_events_display_content_search(){
 
-	//add_action('bp_has_activities','bp_events_activity_search_loop', 10, 2 );
+	
 	if ( is_user_logged_in() && bp_group_is_member() ){
 		//locate_template( array( 'activity/activity-loop.php' ), true );
 		$file = $_SERVER["SCRIPT_NAME"];
@@ -178,41 +178,60 @@ function bp_events_display_content_search(){
 	}
 }
 
-function bp_events_activity_search_loop( $a, $activities ) {
 
-	if ( is_events_group() ){
-		$a .= '&search_terms=teste'; //. @$_POST['events-search-terms'];
-		return $a;
+/**
+ * Adiciona o título ao conteudo do post no activities
+ * 
+ * @param mixed $content
+ * @return mixed
+ */
+function add_title_to_events_group_activity_update_body($content){
+	global $activities_template;
+	 /*$activity = $activities_template;
+	 foreach ( (array)$activity as $key => $value ) {
+		echo '<pre>';
+		echo '<strong>' . $key . ': </strong><br />';
+		print_r( $value );
+		echo '</pre>';
+	} */
+	$custom_meta_act = bp_activity_get_meta($activities_template->activities[$activities_template->current_activity]->id);
+	
+	foreach ( (array)$custom_meta_act as $key => $value ) {
+		echo '<pre>';
+		echo '<strong>' . $key . ': </strong><br />';
+		print_r( $value );
+		echo '</pre>';
 	}
-		
-	else
-		return $activities;
-	/*foreach ( $activities->activities as $key => $activity ) {
-		
-		print $activity;
-		//new_member is the type name (component is 'profile')
-		 if ( $activity->type =='new_member') {
-			unset( $activities->activities[$key] );
 
-			$activities->activity_count = $activities->activity_count-1;
-			$activities->total_activity_count = $activities->total_activity_count-1;
-			$activities->pag_num = $activities->pag_num -1;
-		} 
-	}*/
-
-	/* Renumber the array keys to account for missing items */
-	/* $activities_new = array_values( $activities->activities );
-	$activities->activities = $activities_new; */
-
-	return $activities;
+	return //$custom_meta_act .
+	'<strong>Titulo</strong><br>' . "\n" . $activities_template->activities[$activities_template->current_activity]->id
+	. $content ;
 }
 
+add_filter('bp_get_activity_content_body', 'add_title_to_events_group_activity_update_body');
 
+
+function add_title_to_activity_meta( $params) {
+	global $activities_template;
+	
+	//$tempVar = $activities_template->activities[$activities_template->current_activity]->id + 1;
+	
+	bp_activity_update_meta($activities_template->activities[0]->id, 'bpfb_blog_id',  'teste funcionando');//$_POST['activity-post-title']
+	
+}
+
+add_action( 'bp_activity_add', 'add_title_to_activity_meta', 10, 1 );//bp_activity_add funciona, mas nao tenho o id. outro = bp_activity_posted_update
+
+/* function add_genre_to_activity( $content, $user_id, $activity_id ) {
+	if ( strpos( $content, 'rock' ) )
+		bp_activity_update_meta( $activity_id, 'genre', 'rock' );
+}
+add_action( 'bp_activity_posted_update', 'add_genre_to_activity', 10, 3 ); */
 
 
 
 /**
- * registra os hooks do componente ao hook init
+ * registra os hooks do componente ao hook init para ediçao dos forms de envio
  */
 function bp_events_group_add_activity_forms_hooks(){
 	global $bp;
@@ -223,12 +242,29 @@ function bp_events_group_add_activity_forms_hooks(){
 		add_action('wp_print_scripts', array($me, 'js_load_scripts'));
 		add_action('wp_print_styles', array($me, 'css_load_styles'));
 		add_action('bp_activity_post_form_options','bp_events_group_modify_activity_forms_after');
+		add_action('bp_before_activity_post_form','bp_events_group_modify_activity_forms_before');
 	}
 
 }
 
 add_action('init', 'bp_events_group_add_activity_forms_hooks');
 
+
+
+/**
+ * faz o output do que vem antes do form principal da activity
+ */
+function bp_events_group_modify_activity_forms_before(){
+	?>
+	<br /><label class="add_post_label">T&iacutetulo</label>
+	<input type="text" name="activity-post-title" id="activity-post-title" class="whats-new-post-title" value="" /><br />
+	<?php
+
+}
+
+/**
+ * faz o output do que vem depois do form principal da activity
+ */
 function bp_events_group_modify_activity_forms_after(){
 	?>
 	<input type="hidden" id="whats-new-post-object" name="whats-new-post-object" value="groups" />
@@ -237,7 +273,14 @@ function bp_events_group_modify_activity_forms_after(){
 }
 
 
+
+
+/**
+ * Checa se o current group é de eventos, retorna bool true/false
+ * @return boolean
+ */
 function is_events_group(){
+	global $bp;
 	//todo: adicionar uma tipagem no grupo, para nao depender de nomes nem slugs. talvez com a ajuda do group tags(plugin)
 		//atualizar o plugin  do repo para bp docs.
 		
@@ -250,6 +293,9 @@ function is_events_group(){
 	
 }
 
+/**
+ * modifica o menu dos grupos de eventos
+ */
 function bp_groups_remove_menus_from_events() {
 	global $bp;
 
@@ -268,6 +314,7 @@ function bp_groups_remove_menus_from_events() {
 
 }
 add_action('bp_head', 'bp_groups_remove_menus_from_events', 15);//hook ideal para modificar o menu dos groups do buddypress
+
 
 
 /* function redirect_to_forums() {
