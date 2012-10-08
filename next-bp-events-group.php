@@ -187,40 +187,45 @@ function bp_events_display_content_search(){
  */
 function add_title_to_events_group_activity_update_body($content){
 	global $activities_template;
-	 /*$activity = $activities_template;
-	 foreach ( (array)$activity as $key => $value ) {
+	
+	$custom_meta_act = bp_activity_get_meta($activities_template->activities[$activities_template->current_activity]->id, 'title');
+	
+	/* foreach ( (array)$custom_meta_act as $key => $value ) {
 		echo '<pre>';
 		echo '<strong>' . $key . ': </strong><br />';
 		print_r( $value );
 		echo '</pre>';
 	} */
-	$custom_meta_act = bp_activity_get_meta($activities_template->activities[$activities_template->current_activity]->id);
-	
-	foreach ( (array)$custom_meta_act as $key => $value ) {
-		echo '<pre>';
-		echo '<strong>' . $key . ': </strong><br />';
-		print_r( $value );
-		echo '</pre>';
-	}
 
 	return //$custom_meta_act .
-	'<strong>Titulo</strong><br>' . "\n" . $activities_template->activities[$activities_template->current_activity]->id
+	'<strong>'.$custom_meta_act.'</strong><br>'
 	. $content ;
 }
 
 add_filter('bp_get_activity_content_body', 'add_title_to_events_group_activity_update_body');
 
 
-function add_title_to_activity_meta( $params) {
-	global $activities_template;
+/**
+ * adiciona o titulo no meta do post na activity.
+ * @param $activity
+ */
+function add_title_to_activity_meta( $activity) {
+	//global $activities_template;
 	
 	//$tempVar = $activities_template->activities[$activities_template->current_activity]->id + 1;
+	if($_POST['activity-post-title'])
+		$title_content = @$_POST['activity-post-title'];
+	else
+		$title_content = 'nao pegou o post';
 	
-	bp_activity_update_meta($activities_template->activities[0]->id, 'bpfb_blog_id',  'teste funcionando');//$_POST['activity-post-title']
+	//echo phpinfo(32);
+	
+	
+	bp_activity_update_meta($activity->id, 'title',  $title_content);//$_POST['activity-post-title']
 	
 }
 
-add_action( 'bp_activity_add', 'add_title_to_activity_meta', 10, 1 );//bp_activity_add funciona, mas nao tenho o id. outro = bp_activity_posted_update
+add_action( 'bp_activity_after_save', 'add_title_to_activity_meta', 10, 1 );//testar o bp_actions //bp_activity_add funciona, mas nao tenho o id. outro = bp_activity_posted_update, bp_activity_after_save
 
 /* function add_genre_to_activity( $content, $user_id, $activity_id ) {
 	if ( strpos( $content, 'rock' ) )
@@ -257,7 +262,7 @@ add_action('init', 'bp_events_group_add_activity_forms_hooks');
 function bp_events_group_modify_activity_forms_before(){
 	?>
 	<br /><label class="add_post_label">T&iacutetulo</label>
-	<input type="text" name="activity-post-title" id="activity-post-title" class="whats-new-post-title" value="" /><br />
+	<input type="text" name="activity-post-title" id="activity-post-title" class="whats-new-post-title" value="<?php @$_POST['activity-post-title']?>" /><br />
 	<?php
 
 }
