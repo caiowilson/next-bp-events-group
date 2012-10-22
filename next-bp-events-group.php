@@ -155,13 +155,15 @@ function bp_events_display_content_search(){
 		$path_details=pathinfo($file);
 		$searchterm = @$_POST['searchterm'];
 		
-		?><form NAME ="event-activity-search-form" METHOD ="post" ACTION = "<?php echo $path_details['basename'];  ?>">
+		?>
+		<form NAME ="event-activity-search-form" METHOD ="post" ACTION = "<?php echo $path_details['basename'];  ?>">
 		
 		<input TYPE = "TEXT" id="event-activity-search-input"   Name="searchterm" value="" >
 		
 		<INPUT TYPE = "Submit" Name = "event-activity-search-submit-button" id="event-activity-search-submit-button" VALUE = "Search Activity">
 		
-		</form><?php
+		</form>
+		<?php
 		
 		if ( bp_has_activities('search_terms=' . $searchterm) ) :
 			while ( bp_activities() ) : bp_the_activity();
@@ -173,7 +175,8 @@ function bp_events_display_content_search(){
 		else : ?>
 			<div id="message" class="info">
 			<p><?php _e( 'Sorry, there was no activity found. Please try a different filter.', 'buddypress' ) ?></p>
-			</div><?php 
+			</div>
+			<?php 
 		endif;
 	}
 }
@@ -188,17 +191,17 @@ function bp_events_display_content_search(){
 function add_title_to_events_group_activity_update_body($content){
 	global $activities_template;
 	
-	$custom_meta_act = bp_activity_get_meta($activities_template->activities[$activities_template->current_activity]->id, 'title');
+	$custom_meta_activity_title = bp_activity_get_meta($activities_template->activities[$activities_template->current_activity]->id, 'title');
 	
-	/* foreach ( (array)$custom_meta_act as $key => $value ) {
+	foreach ( (array)$custom_meta_activity_title as $key => $value ) {
 		echo '<pre>';
 		echo '<strong>' . $key . ': </strong><br />';
 		print_r( $value );
 		echo '</pre>';
-	} */
+	}
 
 	return //$custom_meta_act .
-	'<strong>'.$custom_meta_act.'</strong><br>'
+	'<strong>'.$custom_meta_activity_title.'</strong><br>'
 	. $content ;
 }
 
@@ -210,28 +213,25 @@ add_filter('bp_get_activity_content_body', 'add_title_to_events_group_activity_u
  * @param $activity
  */
 function add_title_to_activity_meta( $activity) {
-	//global $activities_template;
-	
-	//$tempVar = $activities_template->activities[$activities_template->current_activity]->id + 1;
-	if($_POST['activity-post-title'])
-		$title_content = @$_POST['activity-post-title'];
-	else
-		$title_content = 'nao pegou o post';
-	
-	//echo phpinfo(32);
-	
+
+	$title_content = 'TITULO AQUI';
 	
 	bp_activity_update_meta($activity->id, 'title',  $title_content);//$_POST['activity-post-title']
 	
 }
 
-add_action( 'bp_activity_after_save', 'add_title_to_activity_meta', 10, 1 );//testar o bp_actions //bp_activity_add funciona, mas nao tenho o id. outro = bp_activity_posted_update, bp_activity_after_save
+add_action( 'bp_activity_after_save', 'add_title_to_activity_meta', 10, 1 );//bp_activity_after_save
 
-/* function add_genre_to_activity( $content, $user_id, $activity_id ) {
-	if ( strpos( $content, 'rock' ) )
-		bp_activity_update_meta( $activity_id, 'genre', 'rock' );
+/* function bp_events_activity_post_data(){
+
+	$testando = $_POST['whats-new'];
+	
+	echo 'OMG' . $testando;
+
 }
-add_action( 'bp_activity_posted_update', 'add_genre_to_activity', 10, 3 ); */
+
+add_filter('wp_ajax_post_update', 'bp_events_activity_post_data');//bp_activity_after_save,bp_actions,bp_activity_add */
+
 
 
 
@@ -262,7 +262,7 @@ add_action('init', 'bp_events_group_add_activity_forms_hooks');
 function bp_events_group_modify_activity_forms_before(){
 	?>
 	<br /><label class="add_post_label">T&iacutetulo</label>
-	<input type="text" name="activity-post-title" id="activity-post-title" class="whats-new-post-title" value="<?php @$_POST['activity-post-title']?>" /><br />
+	<input type="text" name="activity-event-post-title" id="activity-event-post-title" class="whats-new-post-title" value="<?php @$_POST['activity-event-post-title']?>" /><br />
 	<?php
 
 }
