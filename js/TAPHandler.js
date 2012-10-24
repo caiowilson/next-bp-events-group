@@ -10,7 +10,7 @@ jQuery('#aw-whats-new-submit').click( function(){
 
 	jQuery.post(ajaxurl,
 			{
-				action : post_update,
+				action : 'post_update',
 				title  : activityTitle
 			}
 		

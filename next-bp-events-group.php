@@ -259,7 +259,7 @@ function wp_ajax_add_event_title() {
 	
 }
 
-//add_action( 'wp_ajax_post_update', 'wp_ajax_add_event_title');//bp_activity_after_save
+add_action( 'wp_ajax_post_update', 'wp_ajax_add_event_title');//bp_activity_after_save
 
 
 function add_title_to_activity_meta ($activity) {
