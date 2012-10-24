@@ -20,19 +20,42 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+global $title_content;
 function bp_dump() {
-	global $bp;
-	$current_group_slug = $bp->groups->current_group->slug;
-	foreach ( (array)$bp as $key => $value ) {
-		echo '<pre>';
-		echo '<strong>' . $key . ': </strong><br />';
-		print_r( $value );
-		echo '</pre>';
-	}
-	die;
+	
+	echo plugin_dir_url(__FILE__) . 'next-bp-events-group.php';
 }
 //add_action( 'bp_head', 'bp_dump' ); // hooks para ler bp_setup_nav bp_actions e wp e bp_setup_nav bp_head
+
+
+
+function bp_events_js_loader(){
+	$file = $_SERVER["SCRIPT_NAME"];
+	$path_details=pathinfo($file);
+	
+	//wp_localize_script( 'titleactivityposthandler', 'MyAjax', array( 'ajaxurl' => 'http://www.next.icict.fiocruz.br/sec/activity/post/' ) );
+	
+	
+	wp_register_script(
+		'titleactivityposthandler',
+		plugins_url('js/TAPHandler.js', __FILE__), 
+		array('jquery')	
+	);
+
+}
+
+add_action('wp_enqueue_scripts', 'bp_events_js_loader');
+
+
+
+add_action('init', 'bp_events_js_loader');
+add_action('wp_footer', 'print_my_script');
+
+
+function print_my_script() {
+
+	wp_print_scripts('titleactivityposthandler');
+}
 
 
 /**
@@ -193,12 +216,12 @@ function add_title_to_events_group_activity_update_body($content){
 	
 	$custom_meta_activity_title = bp_activity_get_meta($activities_template->activities[$activities_template->current_activity]->id, 'title');
 	
-	foreach ( (array)$custom_meta_activity_title as $key => $value ) {
+	/* foreach ( (array)$custom_meta_activity_title as $key => $value ) {
 		echo '<pre>';
 		echo '<strong>' . $key . ': </strong><br />';
 		print_r( $value );
 		echo '</pre>';
-	}
+	} */
 
 	return //$custom_meta_act .
 	'<strong>'.$custom_meta_activity_title.'</strong><br>'
@@ -208,20 +231,52 @@ function add_title_to_events_group_activity_update_body($content){
 add_filter('bp_get_activity_content_body', 'add_title_to_events_group_activity_update_body');
 
 
+
 /**
  * adiciona o titulo no meta do post na activity.
  * @param $activity
  */
-function add_title_to_activity_meta( $activity) {
-
-	$title_content = 'TITULO AQUI';
+function wp_ajax_add_event_title() {
 	
-	bp_activity_update_meta($activity->id, 'title',  $title_content);//$_POST['activity-post-title']
+	//global $title_content;
+	//check_admin_referer( 'post_update', '_wpnonce_post_update' );
+	//$title_content = $_POST['action'];
+	
+	
+	/* else {
+
+	bp_activity_update_meta($activity->id, 'title',  $title_content);//$_POST['activity-event-post-title'];
+	} */
+	/* $file = $_SERVER["SCRIPT_NAME"];
+	$path_details=pathinfo($file);
+	echo 'actual file = ' . $path_details['basename']; */
+	
+	foreach ( $_POST as $key => $value ) {
+		echo '<strong>' .$key.'</strong>' . ' '  . '=' . ' '  . $value;
+		echo  '<BR> ';
+	} 
+	//exit;
 	
 }
 
-add_action( 'bp_activity_after_save', 'add_title_to_activity_meta', 10, 1 );//bp_activity_after_save
+//add_action( 'wp_ajax_post_update', 'wp_ajax_add_event_title');//bp_activity_after_save
 
+
+function add_title_to_activity_meta ($activity) {
+
+	global $title_content;
+	//echo 'CAIO = '.$title_content;
+	/* else {*/
+
+	bp_activity_update_meta($activity->id, 'title',  $title_content . ' testando ' );//$_POST['activity-event-post-title'];
+	//} 
+	/* $file = $_SERVER["SCRIPT_NAME"];
+	 $path_details=pathinfo($file);
+	echo 'actual file = ' . $path_details['basename']; */
+
+
+}
+add_action('bp_activity_after_save', 'add_title_to_activity_meta', 10 , 1);
 /* function bp_events_activity_post_data(){
 
 	$testando = $_POST['whats-new'];
