@@ -405,7 +405,12 @@ function is_events_group(){
 		
 	$current_group_slug = $bp->groups->current_group->slug;
 	
-	if(strpos($current_group_slug, 'eventos') === false && strpos($current_group_slug, 'eventos') != 0)//o srtpos retorna o boolean false, mas quando acha na primeira posicao retorna 0 o que faz com que a bosta do if leia errado ainda que esteja com === :/
+  if( !empty( $_POST['ocs'] ) && $_POST['ocs'] ){
+    return true;
+  } 
+  
+	if(strpos($current_group_slug, 'eventos') === false &&
+	   strpos($current_group_slug, 'eventos') != 0)//o srtpos retorna o boolean false, mas quando acha na primeira posicao retorna 0 o que faz com que a bosta do if leia errado ainda que esteja com === :/
 		return false;
 	else
 		return true;
@@ -420,7 +425,7 @@ function bp_groups_remove_menus_from_events() {
 
 	$current_group_slug = $bp->groups->current_group->slug;
 
-	if(is_events_group()){
+	if( is_events_group() ){
 		
 		//var_dump($bp->bp_options_nav[$current_group_slug]);
 		
@@ -433,9 +438,6 @@ function bp_groups_remove_menus_from_events() {
     
     $bp->bp_options_nav[$current_group_slug]['invite-anyone']['name'] = 'Convidar para o evento';
     $bp->bp_options_nav[$current_group_slug]['notifications']['name'] = 'Notificações';
-    
-
-
 	}
 
 }
