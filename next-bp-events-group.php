@@ -409,12 +409,8 @@ function is_events_group(){
     return true;
   } 
   
-	if(strpos($current_group_slug, 'eventos') === false &&
-	   strpos($current_group_slug, 'eventos') != 0)//o srtpos retorna o boolean false, mas quando acha na primeira posicao retorna 0 o que faz com que a bosta do if leia errado ainda que esteja com === :/
-		return false;
-	else
-		return true;
-	
+  return false;
+  
 }
 
 /**
