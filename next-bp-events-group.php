@@ -91,7 +91,7 @@ function add_event_group_activity_tabs() {
         'slug' => 'participar',
         'parent_slug' => $bp->groups->current_group->slug,
         'parent_url' => bp_get_group_permalink( $bp->groups->current_group ),
-        'position' => 12,
+        'position' => 2,
         'item_css_id' => 'nav-participar',
         'screen_function' => 'create_event_group_participar',
         'user_has_access' => 1
