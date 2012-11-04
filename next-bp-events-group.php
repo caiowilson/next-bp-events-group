@@ -65,41 +65,44 @@ function add_event_group_activity_tabs() {
 	global $bp;
 
 	if(bp_is_group() && is_events_group()) {
+		  
+/*
 		bp_core_new_subnav_item(
-		array(
-		'name' => 'Activity',
-		'slug' => 'activity',
-		'parent_slug' => $bp->groups->current_group->slug,
-		'parent_url' => bp_get_group_permalink( $bp->groups->current_group ),
-		'position' => 11,
-		'item_css_id' => 'nav-activity',
-		'screen_function' => 'create_event_group_content',
-		'user_has_access' => 1
-		)
-		);
-
-		if ( bp_is_current_action( 'activity' ) ) {
-			add_action( 'bp_template_content_header', create_function( '', 'echo "' . esc_attr( 'Activity' ) . '";' ) );
-			add_action( 'bp_template_title', create_function( '', 'echo "' . esc_attr( 'Activity' ) . '";' ) );
-		}
-		
-		bp_core_new_subnav_item(
-		array(
-		'name' => 'Search',
-		'slug' => 'activity-search',
-		'parent_slug' => $bp->groups->current_group->slug,
-		'parent_url' => bp_get_group_permalink( $bp->groups->current_group ),
-		'position' => 12,
-		'item_css_id' => 'nav-activity-search',
-		'screen_function' => 'create_event_group_content_search',
-		'user_has_access' => 1
-		)
+  		array(
+    		'name' => 'Buscar Trabalhos',
+    		'slug' => 'activity-search',
+    		'parent_slug' => $bp->groups->current_group->slug,
+    		'parent_url' => bp_get_group_permalink( $bp->groups->current_group ),
+    		'position' => 12,
+    		'item_css_id' => 'nav-activity-search',
+    		'screen_function' => 'create_event_group_content_search',
+    		'user_has_access' => 1
+  		)
 		);
 		
 		if ( bp_is_current_action( 'activity-search' ) ) {
 			add_action( 'bp_template_content_header', create_function( '', 'echo "' . esc_attr( 'Activity Search' ) . '";' ) );
 			add_action( 'bp_template_title', create_function( '', 'echo "' . esc_attr( 'Activity Search' ) . '";' ) );
 		}
+    */
+    bp_core_new_subnav_item(
+      array(
+        'name' => 'Participar',
+        'slug' => 'participar',
+        'parent_slug' => $bp->groups->current_group->slug,
+        'parent_url' => bp_get_group_permalink( $bp->groups->current_group ),
+        'position' => 12,
+        'item_css_id' => 'nav-participar',
+        'screen_function' => 'create_event_group_participar',
+        'user_has_access' => 1
+      )
+    );
+    
+    if ( bp_is_current_action( 'participar' ) ) {
+      add_action( 'bp_template_content_header', create_function( '', 'echo "' . esc_attr( 'Participar' ) . '";' ) );
+      add_action( 'bp_template_title', create_function( '', 'echo "' . esc_attr( 'Participar' ) . '";' ) );
+    }    
+    
 	}
 }
 
@@ -127,14 +130,12 @@ function create_event_group_content(){
 	} else {
 		bp_core_load_template(apply_filters('bp_core_template_plugin', 'plugin-template'));
 	}
-
 }
 
 /**
  * cria o conte�do do component search criado.
  */
 function create_event_group_content_search(){
-
 
 	add_action('bp_template_content', 'bp_events_display_content_search');
 
@@ -149,9 +150,26 @@ function create_event_group_content_search(){
 	} else {
 		bp_core_load_template(apply_filters('bp_core_template_plugin', 'plugin-template'));
 	}
-
 }
 
+/**
+ * cria o conte�do do component  compartilhar trabalho
+ */
+function create_event_group_participar(){
+
+
+  add_action('bp_template_content', 'bp_events_display_participar');
+
+  // Load the plugin template file.
+  // BP 1.2 breaks it out into a group-specific template
+  // BP 1.1 includes a generic "plugin-template file
+  //this is a roundabout way of doing it, because I can't find a way to use bp_core_template
+  //to either return a useful value or handle an array of templates
+  $templates = array('groups/single/plugins.php', 'plugin-template.php');
+  
+  bp_core_load_template(apply_filters('bp_core_template_plugin', 'groups/single/plugin-evento'));    
+
+}
 
 
 /**
@@ -166,28 +184,67 @@ function bp_events_display_content(){
 	}
 }
 
+
 /**
  * faz o output do component search
  */
-function bp_events_display_content_search(){
+function bp_events_display_participar(){
 
 	
 	if ( is_user_logged_in() && bp_group_is_member() ){
 		//locate_template( array( 'activity/activity-loop.php' ), true );
 		$file = $_SERVER["SCRIPT_NAME"];
 		$path_details=pathinfo($file);
-		$searchterm = @$_POST['s'];
-		
+    
+		$searchterm = ( !empty($_GET['s']) ) ? $_GET['s'] : '' ;
+    
 		?>
-		<form NAME ="event-activity-search-form" METHOD ="get" ACTION = "<?php echo $path_details['basename'];  ?>">
+
+  <div id="group-activity-search" class="group-activity-search">    
+    <form NAME ="event-activity-search-form" METHOD ="get" ACTION = "<?php echo $path_details['basename'];  ?>">
+    <label for="event-activity-search-input">Buscar: </label>
+      <input TYPE = "TEXT" id="event-activity-search-input" name="s" value="<?php echo $searchterm; ?>" >    
+    <INPUT TYPE = "Submit" Name = "procurar" id="event-activity-search-submit-button" VALUE = "Buscar">
+    <input type="hidden" id="is-in-ocs" name="ocs" value="1" >
+    </form>
+  </div>
+  <br/>
 		
-		<input TYPE = "TEXT" id="event-activity-search-input"   Name="s" value="" >
+<div class="item-list-tabs no-ajax" id="subnav">
+  <ul>
+    <div class="feed"><a href="<?php bp_group_activity_feed_link() ?>" title="<?php _e( 'RSS Feed', 'buddypress' ); ?>"><?php _e( 'RSS', 'buddypress' ) ?></a></div>
+  
+    <?php do_action( 'bp_group_activity_syndication_options' ) ?>
+
+    <li id="activity-filter-select" class="last">
+      <label for="activity-filter-by"><?php _e( 'Listar :', 'buddypress' ); ?></label>
+      <select>
+        <option value="-1"><?php _e( 'tudo', 'buddypress' ) ?></option>
+        <option value="activity_update"><?php _e( 'Show Updates', 'buddypress' ) ?></option>
+
+        <?php if ( bp_is_active( 'forums' ) ) : ?>
+          <option value="new_forum_topic"><?php _e( 'Show New Forum Topics', 'buddypress' ) ?></option>
+          <option value="new_forum_post"><?php _e( 'Show Forum Replies', 'buddypress' ) ?></option>
+        <?php endif; ?>
+
+        <option value="joined_group"><?php _e( 'Show New Group Memberships', 'buddypress' ) ?></option>
+
+        <?php do_action( 'bp_group_activity_filter_options' ) ?>
+      </select>
+    </li>
+  </ul>
+</div><!-- .item-list-tabs -->		
 		
-		<INPUT TYPE = "Submit" Name = "event-activity-search-submit-button" id="event-activity-search-submit-button" VALUE = "Search Activity">
-		
-		</form>
-		<?php
-		
+<?php do_action( 'bp_before_group_activity_content' ) ?>
+
+<div class="activity single-group" role="main">
+  <?php locate_template( array( 'activity/activity-loop.php' ), true ) ?>
+</div><!-- .activity.single-group -->
+
+<?php do_action( 'bp_after_group_activity_content' ) ?>		
+	
+	<?php
+		/*
 		if ( bp_has_activities('search_terms=' . $searchterm) ) :
 			while ( bp_activities() ) : bp_the_activity();
 				?><ul id="activity-stream" class="activity-list item-list">
@@ -201,7 +258,9 @@ function bp_events_display_content_search(){
 			</div>
 			<?php 
 		endif;
+     */
 	}
+  
 }
 
 
@@ -259,7 +318,7 @@ function wp_ajax_add_event_title() {
 	
 }
 
-add_action( 'wp_ajax_post_update', 'wp_ajax_add_event_title');//bp_activity_after_save
+//add_action( 'wp_ajax_post_update', 'wp_ajax_add_event_title');//bp_activity_after_save
 
 
 function add_title_to_activity_meta ($activity) {
@@ -276,7 +335,7 @@ function add_title_to_activity_meta ($activity) {
 
 
 }
-add_action('bp_activity_after_save', 'add_title_to_activity_meta', 10 , 1);
+//add_action('bp_activity_after_save', 'add_title_to_activity_meta', 10 , 1);
 /* function bp_events_activity_post_data(){
 
 	$testando = $_POST['whats-new'];
@@ -307,7 +366,7 @@ function bp_events_group_add_activity_forms_hooks(){
 
 }
 
-add_action('init', 'bp_events_group_add_activity_forms_hooks');
+//add_action('init', 'bp_events_group_add_activity_forms_hooks');
 
 
 
@@ -363,12 +422,19 @@ function bp_groups_remove_menus_from_events() {
 
 	if(is_events_group()){
 		
+		//var_dump($bp->bp_options_nav[$current_group_slug]);
 		
-		$bp->bp_options_nav[$current_group_slug]['home'] = false;
-		$bp->bp_options_nav[$current_group_slug]['forums']['name'] = 'testando';
-		$bp->bp_options_nav[$current_group_slug]['members'] = false;
+		$bp->bp_options_nav[$current_group_slug]['home']['name'] = 'Compartilhar trabalho';
+    $bp->bp_options_nav[$current_group_slug]['forum'] = false;
+		//$bp->bp_options_nav[$current_group_slug]['members'] = false;
 		$bp->bp_options_nav[$current_group_slug]['events'] = false;
 		$bp->bp_options_nav[$current_group_slug]['documents'] = false;
+    $bp->bp_options_nav[$current_group_slug]['hierarchy'] = false;
+    
+    $bp->bp_options_nav[$current_group_slug]['invite-anyone']['name'] = 'Convidar para o evento';
+    $bp->bp_options_nav[$current_group_slug]['notifications']['name'] = 'Notificações';
+    
+
 
 	}
 
