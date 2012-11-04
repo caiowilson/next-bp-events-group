@@ -109,7 +109,7 @@ add_action( 'bp_actions', 'add_event_group_activity_tabs', 8 );
 
 
 /**
- * cria o conteúdo do component criado.
+ * cria o conteï¿½do do component criado.
  */
 function create_event_group_content(){
 
@@ -131,7 +131,7 @@ function create_event_group_content(){
 }
 
 /**
- * cria o conteúdo do component search criado.
+ * cria o conteï¿½do do component search criado.
  */
 function create_event_group_content_search(){
 
@@ -176,12 +176,12 @@ function bp_events_display_content_search(){
 		//locate_template( array( 'activity/activity-loop.php' ), true );
 		$file = $_SERVER["SCRIPT_NAME"];
 		$path_details=pathinfo($file);
-		$searchterm = @$_POST['searchterm'];
+		$searchterm = @$_POST['s'];
 		
 		?>
-		<form NAME ="event-activity-search-form" METHOD ="post" ACTION = "<?php echo $path_details['basename'];  ?>">
+		<form NAME ="event-activity-search-form" METHOD ="get" ACTION = "<?php echo $path_details['basename'];  ?>">
 		
-		<input TYPE = "TEXT" id="event-activity-search-input"   Name="searchterm" value="" >
+		<input TYPE = "TEXT" id="event-activity-search-input"   Name="s" value="" >
 		
 		<INPUT TYPE = "Submit" Name = "event-activity-search-submit-button" id="event-activity-search-submit-button" VALUE = "Search Activity">
 		
@@ -206,7 +206,7 @@ function bp_events_display_content_search(){
 
 
 /**
- * Adiciona o título ao conteudo do post no activities
+ * Adiciona o tï¿½tulo ao conteudo do post no activities
  * 
  * @param mixed $content
  * @return mixed
@@ -291,7 +291,7 @@ add_filter('wp_ajax_post_update', 'bp_events_activity_post_data');//bp_activity_
 
 
 /**
- * registra os hooks do componente ao hook init para ediçao dos forms de envio
+ * registra os hooks do componente ao hook init para ediï¿½ao dos forms de envio
  */
 function bp_events_group_add_activity_forms_hooks(){
 	global $bp;
@@ -336,7 +336,7 @@ function bp_events_group_modify_activity_forms_after(){
 
 
 /**
- * Checa se o current group é de eventos, retorna bool true/false
+ * Checa se o current group ï¿½ de eventos, retorna bool true/false
  * @return boolean
  */
 function is_events_group(){
