@@ -405,7 +405,7 @@ function is_events_group(){
 		
 	$current_group_slug = $bp->groups->current_group->slug;
 	
-  if( !empty( $_POST['ocs'] ) && $_POST['ocs'] ){
+  if( !empty( $_GET['ocs'] ) && $_GET['ocs'] ){
     return true;
   } 
   
