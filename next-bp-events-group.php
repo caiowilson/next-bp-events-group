@@ -423,19 +423,19 @@ function bp_groups_remove_menus_from_events() {
 
 	if( is_events_group() ){
 		
-		//var_dump($bp->bp_options_nav[$current_group_slug]);
-		
+		var_dump($bp->bp_options_nav[$current_group_slug]);
+
 		$bp->bp_options_nav[$current_group_slug]['home']['name'] = 'Compartilhar trabalho';
     $bp->bp_options_nav[$current_group_slug]['forum'] = false;
 		//$bp->bp_options_nav[$current_group_slug]['members'] = false;
 		$bp->bp_options_nav[$current_group_slug]['events'] = false;
 		$bp->bp_options_nav[$current_group_slug]['documents'] = false;
     $bp->bp_options_nav[$current_group_slug]['hierarchy'] = false;
+    $bp->bp_options_nav[$current_group_slug]['members'] = false;
+    $bp->bp_options_nav[$current_group_slug]['invite-anyone'] = false;    
     
-    $bp->bp_options_nav[$current_group_slug]['invite-anyone']['name'] = 'Convidar para o evento';
     $bp->bp_options_nav[$current_group_slug]['notifications']['name'] = 'Notificações';
 	}
-
 }
 add_action('bp_head', 'bp_groups_remove_menus_from_events', 15);//hook ideal para modificar o menu dos groups do buddypress
 
