@@ -14,8 +14,8 @@ class Eventos_Extension extends BP_Group_Extension {
      * Constructor
      */
     function conferencia_extension() {
-        $this->name = 'Conferencia';
-        $this->slug = 'conferencia';
+        $this->name = 'Eventos';
+        $this->slug = 'eventos';
      
         $this->create_step_position = 21;
         $this->nav_item_position = 31;
@@ -107,5 +107,5 @@ class Eventos_Extension extends BP_Group_Extension {
     }
     
 }
-bp_register_group_extension( 'Conferencia_Extension' );
+//bp_register_group_extension( 'Eventos_Extension' );
 
