@@ -61,7 +61,7 @@ global $bp, $wpdb;
     <label for="group-conference-url">Digite a url do sistema de eventos:</label>
     <input type="text" name="group-conference-url" id="group-conference-url" value="<?php echo next_bp_events_group_conference_url(); ?>" />
     
-    <label for="group-conference-submission">Digite o texto para a descrição da submissão</label>
+    <label for="group-conference-submission">Digite o texto para a descrição pagina principal do evento</label>
     <input type="text" name="group-conference-submission" id="group-conference-submission" value="<?php echo next_bp_events_group_conference_submission(); ?>" />
     
   </frameset>
@@ -83,7 +83,8 @@ function next_bp_events_group_custom_group_field_save( $group_id ) {
 
   $plain_fields = array(
     'is-conference',
-    'conference-url'     
+    'conference-url',
+    'conference-submission'    
 /*    'field-3'     */
   );
   foreach( $plain_fields as $field ) {
