@@ -35,6 +35,13 @@ function next_bp_events_group_conference_submission() {
   return $field_meta;
 }
 
+/* get group submission description
+*/
+function next_bp_events_group_conference_banner() {
+  global $bp, $wpdb;
+  $field_meta = groups_get_groupmeta( $bp->groups->current_group->id, 'bp_next_pack_group-conference-banner' );
+  return $field_meta;
+}
 
 
 /* Create the form to save the meta for the group
@@ -60,9 +67,13 @@ global $bp, $wpdb;
     /> Não  
     <label for="group-conference-url">Digite a url do sistema de eventos:</label>
     <input type="text" name="group-conference-url" id="group-conference-url" value="<?php echo next_bp_events_group_conference_url(); ?>" />
+
+    <label for="group-conference-banner">Digite a url do banner do evento:</label>
+    <input type="text" name="group-conference-banner" id="group-conference-banner" value="<?php echo next_bp_events_group_conference_banner(); ?>" />
     
-    <label for="group-conference-submission">Digite o texto para a descrição pagina principal do evento</label>
-    <input type="text" name="group-conference-submission" id="group-conference-submission" value="<?php echo next_bp_events_group_conference_submission(); ?>" />
+    
+    <label for="group-conference-submission">Digite o texto para a descrição da submissão de trabalho do evento</label>
+    <textarea type="text" name="group-conference-submission" id="group-conference-submission"><?php echo next_bp_events_group_conference_submission(); ?></textarea>
     
   </frameset>
  <?php
@@ -84,7 +95,8 @@ function next_bp_events_group_custom_group_field_save( $group_id ) {
   $plain_fields = array(
     'is-conference',
     'conference-url',
-    'conference-submission'    
+    'conference-submission',
+    'conference-banner'      
 /*    'field-3'     */
   );
   foreach( $plain_fields as $field ) {

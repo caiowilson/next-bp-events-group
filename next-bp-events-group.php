@@ -417,7 +417,7 @@ function bp_groups_remove_menus_from_events() {
     $bp->bp_options_nav[$current_group_slug]['hierarchy'] = false;
     $bp->bp_options_nav[$current_group_slug]['members'] = false;
     $bp->bp_options_nav[$current_group_slug]['invite-anyone'] = false;    
-    
+
     $bp->bp_options_nav[$current_group_slug]['notifications']['name'] = 'Notificações';
 	}
 }
